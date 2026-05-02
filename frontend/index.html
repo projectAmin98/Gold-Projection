@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gold Investment Projection System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/frontend/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Gold Investment Projection System</p>
+        <h1>Track today’s value and model where your gold position could go next.</h1>
+        <p class="hero-copy">
+          Analyze historical gold prices, estimate future outcomes, and compare AI projection with your own manual assumptions.
+        </p>
+      </div>
+      <div class="hero-badge">
+        <span>Live Market Data</span>
+        <strong id="marketTimestamp">Loading...</strong>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <section class="panel form-panel">
+        <div class="panel-heading">
+          <h2>Investment Input</h2>
+          <p>Enter your purchase details and choose how you want to forecast future value.</p>
+        </div>
+
+        <form id="projectionForm">
+          <label>
+            <span>Price when bought (per gram)</span>
+            <input type="number" step="0.01" min="0.01" id="pricePerGram" required>
+          </label>
+
+          <label>
+            <span>Total grams purchased</span>
+            <input type="number" step="0.01" min="0.01" id="grams" required>
+          </label>
+
+          <label>
+            <span>Purchase date</span>
+            <input type="date" id="purchaseDate">
+          </label>
+
+          <label>
+            <span>Display currency</span>
+            <select id="displayCurrency">
+              <option value="MYR">MYR</option>
+              <option value="USD">USD</option>
+            </select>
+          </label>
+
+          <label id="projectionYearsGroup">
+            <span>Projection years</span>
+            <input type="text" id="projectionYears" value="1,3,5" placeholder="Example: 1,3,5">
+          </label>
+
+          <div class="toggle-group">
+            <button type="button" class="toggle active" data-mode="ai">Use AI Projection</button>
+            <button type="button" class="toggle" data-mode="manual">Manual Future Price</button>
+          </div>
+
+          <label id="manualPriceGroup" class="hidden">
+            <span>Future price per gram</span>
+            <input type="number" step="0.01" min="0.01" id="futurePricePerGram">
+          </label>
+
+          <button type="submit" class="primary-btn">Generate Projection</button>
+        </form>
+
+        <div class="note-box">
+          <strong>Warning</strong>
+          <p>Projection is estimation, not financial advice.</p>
+        </div>
+        <section class="calculator-box">
+          <div class="section-title-row">
+            <h3>Gold Calculator</h3>
+            <span id="calculatorMarketLabel">Live-linked</span>
+          </div>
+          <p class="calculator-copy">Use the calculator for quick gold value checks without running a full forecast.</p>
+          <div class="calculator-grid">
+            <label>
+              <span>Calculator price per gram</span>
+              <input type="number" step="0.01" min="0.01" id="calcPricePerGram">
+            </label>
+            <label>
+              <span>Calculator grams</span>
+              <input type="number" step="0.01" min="0.01" id="calcGrams">
+            </label>
+            <label class="calculator-span">
+              <span>Budget amount</span>
+              <input type="number" step="0.01" min="0.01" id="calcBudget">
+            </label>
+          </div>
+          <div id="calculatorResults" class="calculator-results"></div>
+        </section>
+      </section>
+
+      <section class="panel results-panel">
+        <div class="panel-heading">
+          <h2>Results Dashboard</h2>
+          <p>Live valuation, profit tracking, and forecast scenarios.</p>
+        </div>
+
+        <div class="local-market-panel">
+          <div class="section-title-row">
+            <h3>Market Highlights</h3>
+            <span id="marketHighlightsLabel">1M and 1Y highs</span>
+          </div>
+          <p class="market-copy">Current market price plus the highest price seen over the last month and year.</p>
+          <div id="marketHighlightsCards" class="local-market-cards"></div>
+        </div>
+
+        <div class="local-market-panel">
+          <div class="section-title-row">
+            <h3>Malaysia Investment Reference</h3>
+            <span id="malaysiaMarketUpdated">Loading...</span>
+          </div>
+          <p class="market-copy">999 spot price for analytics and 999 dealer buyback for realistic selling value in Malaysia.</p>
+          <div id="malaysiaMarketCards" class="local-market-cards"></div>
+          <p class="source-note">
+            Analytics source:
+            <a id="malaysiaMarketSource" href="https://hargaemas.com.my/harga-emas-terkini-di-malaysia/" target="_blank" rel="noreferrer">HargaEmas.com.my</a>
+          </p>
+          <p class="source-note">
+            Realistic sell source:
+            <a id="malaysiaDealerSource" href="https://razak.com.my/store/" target="_blank" rel="noreferrer">Abdul Razak Gold House</a>
+          </p>
+        </div>
+
+        <div class="cards" id="summaryCards"></div>
+
+        <div class="results-grid">
+          <div class="table-card">
+            <div class="section-title-row">
+              <h3>Projection Table</h3>
+              <span id="forecastModeLabel">AI Projection</span>
+            </div>
+            <div id="projectionTableWrapper" class="table-wrapper"></div>
+          </div>
+
+          <div class="table-card">
+            <h3>Forecast Model Signals</h3>
+            <div id="forecastMeta" class="meta-list"></div>
+          </div>
+        </div>
+
+        <div class="scenario-card">
+          <h3>Scenario Range Summary</h3>
+          <div id="scenarioSummary" class="scenario-grid"></div>
+        </div>
+      </section>
+    </main>
+
+    <section class="panel chart-panel">
+      <div class="panel-heading">
+        <h2>Trend Visualization</h2>
+        <p>Historical pricing and projected curve powered by Chart.js.</p>
+      </div>
+      <div class="chart-controls">
+        <button type="button" class="chart-range-btn active" data-range="1mo" data-interval="1d">Days</button>
+        <button type="button" class="chart-range-btn" data-range="6mo" data-interval="1d">Months</button>
+        <button type="button" class="chart-range-btn" data-range="5y" data-interval="1wk">Years</button>
+      </div>
+      <canvas id="goldChart"></canvas>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="/frontend/formModule.js"></script>
+</body>
+</html>
